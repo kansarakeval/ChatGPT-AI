@@ -1,5 +1,6 @@
 import 'package:advance_exam_app/screen/history/model/history_model.dart';
 import 'package:advance_exam_app/screen/home/controller/home_controller.dart';
+import 'package:advance_exam_app/util/db_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -31,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () {
                   Get.toNamed('history');
                 },
-                icon: Icon(
+                icon: const Icon(
                   Icons.history,
                   color: Colors.white,
                 ),)
@@ -65,31 +66,44 @@ class _HomeScreenState extends State<HomeScreen> {
                         )
                       : Container(
                           padding: const EdgeInsets.all(6),
-                          height: MediaQuery.sizeOf(context).height * 0.9,
+                          height: MediaQuery.sizeOf(context).height * 0.8,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
-                            color: Colors.grey.shade200,
+                            color: ([...Colors.primaries]..shuffle()).first.shade100,
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              IconButton(
-                                  onPressed: () {
-                                    HistoryModel historyModel = HistoryModel(
-                                      answer: controller
-                                          .homeModel!
-                                          .value!
-                                          .candidateList![0]
-                                          .content!
-                                          .partsList![0]
-                                          .text,
-                                    );
-                                  },
-                                  icon: Icon(Icons.favorite_border)),
-                              Text(
-                                "${controller.homeModel!.value!.candidateList![0].content!.partsList![0].text}",
-                                style: const TextStyle(fontSize: 17),
+                              Row(
+                                children: [
+                                  const Icon(Icons.edit_outlined),
+                                  const SizedBox(width: 10,),
+                                  const Icon(Icons.copy),
+                                  IconButton(
+                                      onPressed: () {
+                                        HistoryModel historyModel = HistoryModel(
+                                          answer: controller
+                                              .homeModel!
+                                              .value!
+                                              .candidateList![0]
+                                              .content!
+                                              .partsList![0]
+                                              .text,
+                                        );
+                                        DbHelper.helper.insertAiData(historyModel);
+                                      },
+                                      icon: const Icon(Icons.bookmark_border)),
+                                ],
+                              ),
+                              SizedBox(
+                                width: 500,
+                                height: 600,
+                                child: Text(
+                                  "${controller.homeModel!.value!.candidateList![0].content!.partsList![0].text}",
+                                  style: const TextStyle(fontSize: 17),
+                                  overflow: TextOverflow.ellipsis,maxLines: 30,
+                                ),
                               ),
                             ],
                           ),
