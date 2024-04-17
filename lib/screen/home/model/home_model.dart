@@ -1,88 +1,57 @@
 class HomeModel {
-  List<CandidateModel>? candidates;
 
-  HomeModel({this.candidates});
+  List<CandidatesModel>? candidateList = [];
 
-  factory HomeModel.mapToModel(Map m1)
-  {
-    List l1 = m1["candidates"];
+  HomeModel({required this.candidateList});
+
+  factory HomeModel.mapToModel(Map m1){
+    List candidate = m1['candidates'];
+
     return HomeModel(
-      candidates: l1.map((e) => CandidateModel.mapToModel(e)).toList(),
+        candidateList: candidate.map((e) => CandidatesModel.mapToModel(e))
+            .toList()
+    );
+  }
+
+}
+
+class CandidatesModel {
+
+  ContentModel? content;
+
+  CandidatesModel({this.content});
+
+  factory CandidatesModel.mapToModel(Map m1){
+    return CandidatesModel(
+      content: ContentModel.mapToModel(m1['content']),
     );
   }
 }
 
-class CandidateModel {
-  Content? content;
-  String? finishReason;
-  int? index;
-  List<SafetyRating>? safetyRatings;
+class ContentModel {
+  List<PartsModel>? partsList = [];
 
-  CandidateModel({
-    this.content,
-    this.finishReason,
-    this.index,
-    this.safetyRatings,
-  });
+  ContentModel({required this.partsList});
 
-  factory CandidateModel.mapToModel(Map m1)
-  {
-    List l1=m1['safetyRatings'];
-    return CandidateModel(
-      content: m1['content'],
-      finishReason: m1['finishReason'],
-      index: m1['index'],
-      safetyRatings: l1.map((e) => SafetyRating.mapToModel(e)).toList(),
+  factory ContentModel.mapToModel(Map m1){
+
+    List parts = m1['parts'];
+    return ContentModel(
+      partsList: parts = parts.map((e) => PartsModel.mapToModel(e)).toList(),
     );
   }
 }
 
-class Content {
-  List<Part>? parts;
-  String? role;
+class PartsModel {
 
-  Content({
-    this.parts,
-    this.role,
-  });
-
-  factory Content.mapToModel(Map m1)
-  {
-    List l1=m1['parts'];
-    return Content(
-      parts: l1.map((e) => Part.mapToModel(e)).toList(),
-      role: m1["role"],
-    );
-  }
-}
-
-class Part {
   String? text;
 
-  Part({
-    this.text,
-  });
+  PartsModel({this.text});
 
-  factory Part.mapToModel(Map m1) {
-    return Part(
-      text: m1["text"],
+  factory PartsModel.mapToModel(Map m1){
+    return PartsModel(
+      text: m1['text'],
     );
   }
 }
 
-class SafetyRating {
-  String? category;
-  String? probability;
-
-  SafetyRating({
-    this.category,
-    this.probability,
-  });
-
-  factory SafetyRating.mapToModel(Map m1) {
-    return SafetyRating(
-      category: m1["category"],
-      probability: m1["probability"],
-    );
-  }
-}

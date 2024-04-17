@@ -7,7 +7,7 @@ import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 class HomeController extends GetxController {
   Rxn<HomeModel>? homeModel = Rxn();
 
-  Future<void> gethomeData(String edit) async {
+  Future<void> getHomeData(String edit) async {
     APIHelper apiHelper = APIHelper();
     HomeModel? w1 = await apiHelper.homeAPICall(edit);
     homeModel?.value = w1;

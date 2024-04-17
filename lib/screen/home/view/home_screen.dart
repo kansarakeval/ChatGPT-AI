@@ -1,3 +1,4 @@
+import 'package:advance_exam_app/screen/history/model/history_model.dart';
 import 'package:advance_exam_app/screen/home/controller/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,48 +13,93 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   TextEditingController txtedit = TextEditingController();
-  HomeController controller= Get.put(HomeController());
-
+  HomeController controller = Get.put(HomeController());
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "ChatGPT AI",
-          style: TextStyle(color: Colors.white),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            "ChatGPT AI",
+            style: TextStyle(color: Colors.white),
+          ),
+          centerTitle: true,
+          backgroundColor: Colors.black87,
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Get.toNamed('history');
+                },
+                icon: Icon(
+                  Icons.history,
+                  color: Colors.white,
+                ),)
+          ],
         ),
-        centerTitle: true,
-        backgroundColor: Colors.black87,
-      ),
-          body:  Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  TextField(
-                    controller: txtedit,
-                    decoration:  InputDecoration(
-                      labelText: 'Search',
-                      border: OutlineInputBorder(),
-                      suffixIcon: IconButton(onPressed: () async {
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  controller: txtedit,
+                  decoration: InputDecoration(
+                    labelText: 'Search',
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      onPressed: () async {
                         String edit = txtedit.text;
-                        await controller.gethomeData(edit);
-                      }, icon: Icon(Icons.search)),
+                        await controller.getHomeData(edit);
+                      },
+                      icon: const Icon(Icons.search),
                     ),
                   ),
-                  SizedBox(height: 10,),
-                  Container(
-                    height: MediaQuery.sizeOf(context).height*0.8,
-                    width: double.infinity,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: Colors.grey.shade200,),
-                    child: Text(),
-                  )
-                ],
-              ),
+                ),
+                const SizedBox(height: 10),
+                Obx(
+                  () => controller.homeModel!.value == null
+                      ? const Text(
+                          "Please wait....",
+                          style: TextStyle(fontSize: 25),
+                        )
+                      : Container(
+                          padding: const EdgeInsets.all(6),
+                          height: MediaQuery.sizeOf(context).height * 0.9,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.grey.shade200,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              IconButton(
+                                  onPressed: () {
+                                    HistoryModel historyModel = HistoryModel(
+                                      answer: controller
+                                          .homeModel!
+                                          .value!
+                                          .candidateList![0]
+                                          .content!
+                                          .partsList![0]
+                                          .text,
+                                    );
+                                  },
+                                  icon: Icon(Icons.favorite_border)),
+                              Text(
+                                "${controller.homeModel!.value!.candidateList![0].content!.partsList![0].text}",
+                                style: const TextStyle(fontSize: 17),
+                              ),
+                            ],
+                          ),
+                        ),
+                ),
+              ],
             ),
           ),
-    ));
+        ),
+      ),
+    );
   }
 }
