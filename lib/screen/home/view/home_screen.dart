@@ -1,20 +1,23 @@
 import 'package:advance_exam_app/screen/history/model/history_model.dart';
 import 'package:advance_exam_app/screen/home/controller/home_controller.dart';
+import 'package:advance_exam_app/screen/home/model/home_model.dart';
 import 'package:advance_exam_app/util/db_helper.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  TextEditingController txtedit = TextEditingController();
   HomeController controller = Get.put(HomeController());
+  TextEditingController txtedit = TextEditingController();
+  var chatHistory = <HomeModel>[].obs;
 
   @override
   Widget build(BuildContext context) {
@@ -29,89 +32,101 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: Colors.black87,
           actions: [
             IconButton(
-                onPressed: () {
-                  Get.toNamed('history');
-                },
-                icon: const Icon(
-                  Icons.history,
-                  color: Colors.white,
-                ),)
+              onPressed: () {
+                Get.toNamed('history');
+              },
+              icon: const Icon(
+                Icons.history,
+                color: Colors.white,
+              ),
+            )
           ],
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextField(
-                  controller: txtedit,
-                  decoration: InputDecoration(
-                    labelText: 'Search',
-                    border: const OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      onPressed: () async {
-                        String edit = txtedit.text;
-                        await controller.getHomeData(edit);
-                      },
-                      icon: const Icon(Icons.search),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Obx(
-                  () => controller.homeModel!.value == null
-                      ? const Text(
-                          "Please wait....",
-                          style: TextStyle(fontSize: 25),
-                        )
-                      : Container(
+        body: Column(
+          children: [
+            Expanded(
+              child: Obx(
+                    () => ListView.builder(
+                  itemCount: chatHistory.length,
+                  itemBuilder: (context, index) {
+                    final message = chatHistory[index];
+                    return Column(
+                      crossAxisAlignment:
+                      message.candidateList![0].content!.partsList![0].text != null &&
+                          message.candidateList![0].content!.partsList![0].text!.startsWith('You')
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
+                      children: [
+                        Container(
                           padding: const EdgeInsets.all(6),
-                          height: MediaQuery.sizeOf(context).height * 0.8,
-                          width: double.infinity,
+                          margin: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                             color: ([...Colors.primaries]..shuffle()).first.shade100,
                           ),
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 children: [
                                   const Icon(Icons.edit_outlined),
-                                  const SizedBox(width: 10,),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
                                   const Icon(Icons.copy),
                                   IconButton(
-                                      onPressed: () {
-                                        HistoryModel historyModel = HistoryModel(
-                                          answer: controller
-                                              .homeModel!
-                                              .value!
-                                              .candidateList![0]
-                                              .content!
-                                              .partsList![0]
-                                              .text,
-                                        );
-                                        DbHelper.helper.insertAiData(historyModel);
-                                      },
-                                      icon: const Icon(Icons.bookmark_border)),
+                                    onPressed: () {
+                                      HistoryModel historyModel =
+                                      HistoryModel(
+                                        answer: message.candidateList![0].content!.partsList![0].text,
+                                      );
+                                      DbHelper.helper
+                                          .insertAiData(historyModel);
+                                    },
+                                    icon: const Icon(Icons.bookmark_border),
+                                  ),
                                 ],
                               ),
-                              SizedBox(
-                                width: 500,
-                                height: 600,
-                                child: Text(
-                                  "${controller.homeModel!.value!.candidateList![0].content!.partsList![0].text}",
-                                  style: const TextStyle(fontSize: 17),
-                                  overflow: TextOverflow.ellipsis,maxLines: 30,
-                                ),
+                              Text(
+                                message.candidateList![0].content!.partsList![0].text ?? '',
+                                style: const TextStyle(fontSize: 17),
                               ),
                             ],
                           ),
                         ),
+                      ],
+                    );
+                  },
                 ),
-              ],
+              ),
             ),
-          ),
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: txtedit,
+                      decoration: const InputDecoration(
+                        labelText: 'Search',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () async {
+                      String edit = txtedit.text;
+                      await controller.getHomeData(edit);
+                      chatHistory.add(controller.homeModel!.value!);
+                      txtedit.clear();
+                    },
+                    icon: const Icon(Icons.send),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
