@@ -1,6 +1,5 @@
 import 'package:advance_exam_app/screen/history/model/history_model.dart';
 import 'package:advance_exam_app/screen/home/controller/home_controller.dart';
-import 'package:advance_exam_app/screen/home/model/home_model.dart';
 import 'package:advance_exam_app/util/db_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +16,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   HomeController controller = Get.put(HomeController());
   TextEditingController txtedit = TextEditingController();
-  var chatHistory = <HomeModel>[].obs;
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +45,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: Obx(
                     () => ListView.builder(
-                  itemCount: chatHistory.length,
+                  itemCount: controller.chatHistory.length,
                   itemBuilder: (context, index) {
-                    final message = chatHistory[index];
+                    final message = controller.chatHistory[index];
                     return Column(
                       crossAxisAlignment:
                       message.candidateList![0].content!.partsList![0].text != null &&
@@ -118,8 +116,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () async {
                       String edit = txtedit.text;
                       await controller.getHomeData(edit);
-                      chatHistory.add(controller.homeModel!.value!);
-                      txtedit.clear();
+                      if (controller.homeModel!.value != null) {
+                        controller.chatHistory.add(controller.homeModel!.value!);
+                        txtedit.clear();
+                      }
                     },
                     icon: const Icon(Icons.send),
                   ),
