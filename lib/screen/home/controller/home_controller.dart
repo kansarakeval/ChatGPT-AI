@@ -6,11 +6,14 @@ import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
 class HomeController extends GetxController {
   Rxn<HomeModel>? homeModel = Rxn();
-  RxList<HomeModel> chatHistory = <HomeModel>[].obs;
+  RxList<String> chatHistory = <String>[].obs;
 
   Future<void> getHomeData(String edit) async {
     APIHelper apiHelper = APIHelper();
     HomeModel? w1 = await apiHelper.homeAPICall(edit);
     homeModel?.value = w1;
+    if (homeModel!.value != null) {
+      chatHistory.add(homeModel!.value!.candidateList![0].content!.partsList![0].text!);
+    }
   }
 }

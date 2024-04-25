@@ -49,11 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (context, index) {
                     final message = controller.chatHistory[index];
                     return Column(
-                      crossAxisAlignment:
-                      message.candidateList![0].content!.partsList![0].text != null &&
-                          message.candidateList![0].content!.partsList![0].text!.startsWith('You')
-                          ? CrossAxisAlignment.end
-                          : CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
                           padding: const EdgeInsets.all(6),
@@ -75,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     onPressed: () {
                                       HistoryModel historyModel =
                                       HistoryModel(
-                                        answer: message.candidateList![0].content!.partsList![0].text,
+                                        answer: message,
                                       );
                                       DbHelper.helper
                                           .insertAiData(historyModel);
@@ -85,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                               Text(
-                                message.candidateList![0].content!.partsList![0].text ?? '',
+                                message,
                                 style: const TextStyle(fontSize: 17),
                               ),
                             ],
@@ -115,11 +111,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   IconButton(
                     onPressed: () async {
                       String edit = txtedit.text;
+                      controller.chatHistory.add(edit);
                       await controller.getHomeData(edit);
-                      if (controller.homeModel!.value != null) {
-                        controller.chatHistory.add(controller.homeModel!.value!);
-                        txtedit.clear();
-                      }
+                      txtedit.clear();
+
                     },
                     icon: const Icon(Icons.send),
                   ),
