@@ -44,10 +44,11 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Expanded(
               child: Obx(
-                    () => ListView.builder(
+                () => ListView.builder(
+                  reverse: true,
                   itemCount: controller.chatHistory.length,
                   itemBuilder: (context, index) {
-                    final message = controller.chatHistory[index];
+                    final message = controller.chatHistory.length - index - 1;
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -56,35 +57,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           margin: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
-                            color: ([...Colors.primaries]..shuffle()).first.shade100,
+                            color: ([...Colors.primaries]..shuffle())
+                                .first
+                                .shade100,
                           ),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  const Icon(Icons.edit_outlined),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  const Icon(Icons.copy),
-                                  IconButton(
-                                    onPressed: () {
-                                      HistoryModel historyModel =
-                                      HistoryModel(
-                                        answer: message,
-                                      );
-                                      DbHelper.helper
-                                          .insertAiData(historyModel);
-                                    },
-                                    icon: const Icon(Icons.bookmark_border),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                message,
-                                style: const TextStyle(fontSize: 17),
-                              ),
-                            ],
+                          child: Text(
+                            controller.chatHistory[message],
+                            style: const TextStyle(fontSize: 17),
                           ),
                         ),
                       ],
@@ -93,33 +72,43 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
+            Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: TextFormField(
                       controller: txtedit,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Search',
                         border: OutlineInputBorder(),
                         filled: true,
                         fillColor: Colors.white,
+                        suffixIcon: ValueListenableBuilder(
+                          valueListenable: controller.isLoding,
+                          builder: (context, value, child) {
+                            if (value) {
+                              return const CircularProgressIndicator();
+                            }
+                            return IconButton(
+                              onPressed: () async {
+                                String edit = txtedit.text;
+                                controller.chatHistory.add(edit);
+                                HistoryModel model =
+                                    HistoryModel(answer: txtedit.text);
+                                DbHelper.helper.insertAiData(model);
+                                await controller.getHomeData(edit);
+                                txtedit.clear();
+                              },
+                              icon: const Icon(Icons.send),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
-                  IconButton(
-                    onPressed: () async {
-                      String edit = txtedit.text;
-                      controller.chatHistory.add(edit);
-                      await controller.getHomeData(edit);
-                      txtedit.clear();
-
-                    },
-                    icon: const Icon(Icons.send),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
