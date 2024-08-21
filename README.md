@@ -5,17 +5,9 @@ file name : advance_exam_app
 A new Flutter project.
 
 ## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- API
+- Stat Management - Getx
+- CRUD
 
 <p>
   <img src="https://github.com/kansarakeval/advance_exam_app/assets/119046853/b48d979c-7d14-4a0a-a5a0-ae195c09e71d" hight="450" width="180">
